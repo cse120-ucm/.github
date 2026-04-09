@@ -9,7 +9,7 @@ on:
 jobs:
   scan:
     name: gitleaks-scan
-    runs-on: rc-runner-cse120
+    runs-on: arc-runner-cse120
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
