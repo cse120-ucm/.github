@@ -18,11 +18,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
+          # Still necessary so Gitleaks can see the codebase
           fetch-depth: 0
 
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      - name: Run Gitleaks (CLI Bypass)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
-          GITLEAKS_ARGS: "--verbose --redact --source=."
+        run: |
+          # 1. Download the exact same Gitleaks binary the Action was trying to use
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar -xz -C /tmp
+          
+          # 2. Force a direct scan of the workspace, completely ignoring the PR commit diff logic
+          /tmp/gitleaks detect --source . --verbose --redact
